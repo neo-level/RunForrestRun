@@ -10,7 +10,6 @@ public class GenerateWorld : MonoBehaviour
     private static sbyte _stairHeight = 5;
     private static sbyte _platformLength = 10;
     private static sbyte _platformTLength = 20;
-    private static sbyte _platformHeight = -10;
 
     private static byte _stairRotation = 180;
 
@@ -43,17 +42,12 @@ public class GenerateWorld : MonoBehaviour
                                            (PlayerController.player.transform.forward * _platformLength);
             }
 
-            switch (lastPlatform.tag)
+            if (lastPlatform.CompareTag("stairsUp"))
             {
-                case "stairsUp":
-                    dummy.transform.Translate(Vector3.up * _stairHeight);
-                    break;
-                case "stairsDown":
-                    dummy.transform.Translate(Vector3.down * _stairHeight);
-                    platform.transform.Rotate(Vector3.up * _stairRotation);
-                    platform.transform.position = dummy.transform.position;
-                    break;
+                dummy.transform.Translate(Vector3.up * _stairHeight);
+
             }
+
         }
 
         // record the last platform that we want to place down.
@@ -62,6 +56,12 @@ public class GenerateWorld : MonoBehaviour
         platform.transform.position = dummy.transform.position;
         platform.transform.rotation = dummy.transform.rotation;
 
-        dummy.transform.Translate(Vector3.forward * _platformHeight);
+        if (platform.CompareTag("stairsDown"))
+        {
+            dummy.transform.Translate(Vector3.down * _stairHeight);
+            platform.transform.Rotate(Vector3.up * _stairRotation);
+            platform.transform.position = dummy.transform.position;
+        }
+        
     }
 }

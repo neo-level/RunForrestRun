@@ -46,10 +46,14 @@ public class PlayerController : MonoBehaviour
         else if (Input.GetKeyDown(key: KeyCode.RightArrow) && _canTurn)
         {
             transform.Rotate(Vector3.up * 90);
+            GenerateWorld.dummy.transform.forward = -transform.forward;
+            GenerateWorld.RunDummy();
         }
         else if (Input.GetKeyDown(key: KeyCode.LeftArrow) && _canTurn)
         {
             transform.Rotate(Vector3.down * 90);
+            GenerateWorld.dummy.transform.forward = -transform.forward;
+            GenerateWorld.RunDummy();
         }
 
         else if (Input.GetKeyDown(key: KeyCode.A))
@@ -88,7 +92,10 @@ public class PlayerController : MonoBehaviour
     /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
-        GenerateWorld.RunDummy();
+        if (other is BoxCollider && !GenerateWorld.lastPlatform.CompareTag("platformTSection"))
+        {
+            GenerateWorld.RunDummy();
+        }
 
         // The only sphere collider on the T-section to only enable turning there.
         if (other is SphereCollider)
