@@ -4,54 +4,35 @@ using UnityEngine;
 
 public class GenerateWorld : MonoBehaviour
 {
-    private GameObject _dummy;
+    public static GameObject dummy;
+    public static GameObject lastPlatform;
 
-    private sbyte[] randomTurn = {-90, 90};
+    private static sbyte _platformLength = 10;  
 
-    private sbyte _numberOfGeneratedPlatforms = 20;
-    private sbyte _stairHeight = 5;
-    private sbyte _platformHeight = -10;
-
-    private byte _stairRotation = 180;
-
-    private void Start()
+    private void Awake()
     {
-        // Use the dummy as a reference point.
-        _dummy = new GameObject("dummy");
+        // Use a dummy as a reference point.
+        dummy = new GameObject("dummy");
+    }
 
-        for (int i = 0; i < _numberOfGeneratedPlatforms; i++)
+    public static void RunDummy()
+    {
+        GameObject platform = Pool.singleton.GetRandom();
+
+        if (platform == null) return;
+
+
+        if (lastPlatform != null)
         {
-            var platform = Pool.singleton.GetRandom();
-
-            if (platform == null) return;
-
-            platform.SetActive(true);
-            platform.transform.position = _dummy.transform.position;
-            platform.transform.rotation = _dummy.transform.rotation;
-
-
-            switch (platform.tag)
-            {
-                case "stairsUp":
-                    _dummy.transform.Translate(Vector3.up * _stairHeight);
-                    break;
-
-                case "stairsDown":
-                    _dummy.transform.Translate(Vector3.down * _stairHeight);
-
-                    platform.transform.Rotate(Vector3.up * _stairRotation);
-                    platform.transform.position = _dummy.transform.position;
-                    break;
-
-                case "platformTSection":
-                    int turn = Random.Range(0, randomTurn.Length);
-
-                    _dummy.transform.Rotate(Vector3.up * randomTurn[turn]);
-                    _dummy.transform.Translate(Vector3.forward * _platformHeight);
-                    break;
-            }
-
-            _dummy.transform.Translate(Vector3.forward * _platformHeight);
+            // Position the dummy one platform ahead from the last generated one.
+            dummy.transform.position = lastPlatform.transform.position + 
+                                       (PlayerController.player.transform.forward * _platformLength);
         }
+
+        // record the last platform that we want to place down.
+        lastPlatform = platform;
+        platform.SetActive(true);
+        platform.transform.position = dummy.transform.position;
+        platform.transform.rotation = dummy.transform.rotation;
     }
 }
