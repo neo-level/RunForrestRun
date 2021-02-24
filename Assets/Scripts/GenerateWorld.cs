@@ -16,12 +16,13 @@ public class GenerateWorld : MonoBehaviour
 
     private void Start()
     {
+        // Use the dummy as a reference point.
         _dummy = new GameObject("dummy");
 
         for (int i = 0; i < _numberOfGeneratedPlatforms; i++)
         {
             var platform = Pool.singleton.GetRandom();
-            
+
             if (platform == null) return;
 
             platform.SetActive(true);

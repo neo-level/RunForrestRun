@@ -21,7 +21,7 @@ public class Pool : MonoBehaviour
     {
         singleton = this;
         pooledItems = new List<GameObject>();
-        
+
         foreach (PoolItem item in items)
         {
             for (int i = 0; i < item.amount; i++)
@@ -63,6 +63,7 @@ public class Pool : MonoBehaviour
 public static class Utils
 {
     public static System.Random r = new System.Random();
+
     public static void Shuffle<T>(this IList<T> list)
     {
         int n = list.Count;
@@ -75,7 +76,4 @@ public static class Utils
             list[n] = value;
         }
     }
-
 }
-
-

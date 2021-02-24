@@ -2,39 +2,42 @@
 
 public class PlayerController : MonoBehaviour
 {
-    Animator _animator;
+    private Animator _animator;
+    private Rigidbody _rigidbody;
+
     public static GameObject player;
     public static GameObject currentPlatform;
-    bool _canTurn = false;
-    Vector3 _startPosition;
+
+    private bool _canTurn;
+
+    private sbyte _jumpForce = 5;
+
+    private Vector3 _startPosition;
+
     private static readonly int Jumping = Animator.StringToHash("isJumping");
-    private static readonly int Magic = Animator.StringToHash("HasMagic");
 
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        _animator = this.GetComponent<Animator>();
-        player = this.gameObject;
+        _animator = GetComponent<Animator>();
+        _rigidbody = GetComponent<Rigidbody>();
+        player = gameObject;
         _startPosition = player.transform.position;
     }
 
-
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         UserMovement();
     }
 
+    /// <summary>
+    /// Handles the players movement. and jump mechanism.
+    /// </summary>
     private void UserMovement()
     {
-        if (Input.GetKeyDown(key: KeyCode.Space) && !_animator.GetBool(Magic))
+        if (Input.GetKeyDown(key: KeyCode.Space))
         {
             IsJumping(true);
-        }
-        else if (Input.GetKeyDown(key: KeyCode.M) && !_animator.GetBool(Jumping))
-        {
-            HasMagic(true);
+            _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
         }
         else if (Input.GetKeyDown(key: KeyCode.RightArrow))
         {
@@ -57,23 +60,21 @@ public class PlayerController : MonoBehaviour
         else
         {
             IsJumping(false);
-            HasMagic(false);
         }
     }
 
+    /// <summary>
+    /// Takes in a boolean that sets the animation to its respective state.
+    /// </summary>
+    /// <param name="isSpacePressed"></param>
     private void IsJumping(bool isSpacePressed)
     {
         _animator.SetBool(Jumping, isSpacePressed);
     }
 
-    private void HasMagic(bool isMPressed)
-    {
-        _animator.SetBool(Magic, isMPressed);
-    }
-    
-
     private void OnCollisionEnter(Collision other)
     {
+        // Records every platform we stand on.
         currentPlatform = other.gameObject;
     }
 }
