@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (Input.GetKeyDown(key: KeyCode.RightArrow) && _canTurn)
         {
-            transform.Rotate(Vector3.up * _turnAngle);
+            RotatePlayer(Vector3.up);
             RelocateDummyPosition();
             GenerateWorld.RunDummy();
             AddAnotherPlatform();
@@ -56,7 +56,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (Input.GetKeyDown(key: KeyCode.LeftArrow) && _canTurn)
         {
-            transform.Rotate(Vector3.down * _turnAngle);
+            RotatePlayer(Vector3.down);
             RelocateDummyPosition();
             GenerateWorld.RunDummy();
             AddAnotherPlatform();
@@ -113,6 +113,15 @@ public class PlayerController : MonoBehaviour
     {
         GenerateWorld.dummy.transform.forward = -transform.forward;
     }
+
+    /// <summary>
+    /// Rotates the player in the desired direction with a given angle.
+    /// </summary>
+    /// <param name="direction"></param>
+    private void RotatePlayer(Vector3 direction)
+    {
+        transform.Rotate(direction * _turnAngle);
+    }
     
     private void OnCollisionEnter(Collision other)
     {
@@ -138,6 +147,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Prevents the user from turning when leaving the T-section. 
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerExit(Collider other)
     {
         if (other is SphereCollider)
