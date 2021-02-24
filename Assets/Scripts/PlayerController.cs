@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
         else if (Input.GetKeyDown(key: KeyCode.RightArrow) && _canTurn)
         {
             transform.Rotate(Vector3.up * _turnAngle);
-            GenerateWorld.dummy.transform.forward = -transform.forward;
+            RelocateDummyPosition();
             GenerateWorld.RunDummy();
             AddAnotherPlatform();
             StabilizePlayer();
@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour
         else if (Input.GetKeyDown(key: KeyCode.LeftArrow) && _canTurn)
         {
             transform.Rotate(Vector3.down * _turnAngle);
-            GenerateWorld.dummy.transform.forward = -transform.forward;
+            RelocateDummyPosition();
             GenerateWorld.RunDummy();
             AddAnotherPlatform();
             StabilizePlayer();
@@ -106,6 +106,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Relocates the Dummies position accordingly when the players changes.
+    /// </summary>
+    private void RelocateDummyPosition()
+    {
+        GenerateWorld.dummy.transform.forward = -transform.forward;
+    }
+    
     private void OnCollisionEnter(Collision other)
     {
         // Records every platform we stand on.
