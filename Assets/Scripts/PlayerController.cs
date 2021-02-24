@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     private bool _canTurn;
 
     private sbyte _jumpForce = 5;
+    private sbyte _turnAngle = 90;
 
     private Vector3 _startPosition;
 
@@ -21,11 +22,13 @@ public class PlayerController : MonoBehaviour
     {
         _animator = GetComponent<Animator>();
         _rigidbody = GetComponent<Rigidbody>();
+
+        // Starting position of player.
         player = gameObject;
         _startPosition = player.transform.position;
-        
+
         // creates the first platform attached to the start point.
-        GenerateWorld.RunDummy(); 
+        GenerateWorld.RunDummy();
     }
 
     private void Update()
@@ -45,15 +48,19 @@ public class PlayerController : MonoBehaviour
         }
         else if (Input.GetKeyDown(key: KeyCode.RightArrow) && _canTurn)
         {
-            transform.Rotate(Vector3.up * 90);
+            transform.Rotate(Vector3.up * _turnAngle);
             GenerateWorld.dummy.transform.forward = -transform.forward;
             GenerateWorld.RunDummy();
+            AddAnotherPlatform();
+            StabilizePlayer();
         }
         else if (Input.GetKeyDown(key: KeyCode.LeftArrow) && _canTurn)
         {
-            transform.Rotate(Vector3.down * 90);
+            transform.Rotate(Vector3.down * _turnAngle);
             GenerateWorld.dummy.transform.forward = -transform.forward;
             GenerateWorld.RunDummy();
+            AddAnotherPlatform();
+            StabilizePlayer();
         }
 
         else if (Input.GetKeyDown(key: KeyCode.A))
@@ -78,6 +85,25 @@ public class PlayerController : MonoBehaviour
     private void IsJumping(bool isSpacePressed)
     {
         _animator.SetBool(Jumping, isSpacePressed);
+    }
+
+    /// <summary>
+    /// Prevents player from drifting on the x or z axis.
+    /// </summary>
+    private void StabilizePlayer()
+    {
+        transform.position = new Vector3(_startPosition.x, transform.position.y, _startPosition.z);
+    }
+    
+    /// <summary>
+    /// Adds another platform ahead of the player so that it can't see the platforms being spawned.
+    /// </summary>
+    private void AddAnotherPlatform()
+    {
+        if (!GenerateWorld.lastPlatform.CompareTag("platformTSection"))
+        {
+            GenerateWorld.RunDummy();
+        }
     }
 
     private void OnCollisionEnter(Collision other)
