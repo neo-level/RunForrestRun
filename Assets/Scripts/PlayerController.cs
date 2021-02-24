@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -22,6 +23,9 @@ public class PlayerController : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         player = gameObject;
         _startPosition = player.transform.position;
+        
+        // creates the first platform attached to the start point.
+        GenerateWorld.RunDummy(); 
     }
 
     private void Update()
@@ -39,11 +43,11 @@ public class PlayerController : MonoBehaviour
             IsJumping(true);
             _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
         }
-        else if (Input.GetKeyDown(key: KeyCode.RightArrow))
+        else if (Input.GetKeyDown(key: KeyCode.RightArrow) && _canTurn)
         {
             transform.Rotate(Vector3.up * 90);
         }
-        else if (Input.GetKeyDown(key: KeyCode.LeftArrow))
+        else if (Input.GetKeyDown(key: KeyCode.LeftArrow) && _canTurn)
         {
             transform.Rotate(Vector3.down * 90);
         }
@@ -76,5 +80,28 @@ public class PlayerController : MonoBehaviour
     {
         // Records every platform we stand on.
         currentPlatform = other.gameObject;
+    }
+
+    /// <summary>
+    /// When the collider is touched, generate another platform.
+    /// </summary>
+    /// <param name="other"></param>
+    private void OnTriggerEnter(Collider other)
+    {
+        GenerateWorld.RunDummy();
+
+        // The only sphere collider on the T-section to only enable turning there.
+        if (other is SphereCollider)
+        {
+            _canTurn = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other is SphereCollider)
+        {
+            _canTurn = false;
+        }
     }
 }
