@@ -1,22 +1,29 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
 {
-    private Animator _animator;
-    private Rigidbody _rigidbody;
-
     public static GameObject player;
     public static GameObject currentPlatform;
+    public static bool isDead;
+
+    private Animator _animator;
+    private Rigidbody _rigidbody;
+    private Vector3 _startPosition;
+
+    [SerializeField] private SfxManager sfxManager;
+    [SerializeField] private GameObject gameMusic;
 
     private bool _canTurn;
 
     private sbyte _jumpForce = 5;
     private sbyte _turnAngle = 90;
 
-    private Vector3 _startPosition;
-
     private static readonly int Jumping = Animator.StringToHash("isJumping");
+    private static readonly int IsDead = Animator.StringToHash("isDead");
+    private static readonly int Magic = Animator.StringToHash("hasMagic");
 
     private void Start()
     {
@@ -33,6 +40,8 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (isDead) return;
+        
         UserMovement();
     }
 
@@ -43,8 +52,13 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(key: KeyCode.Space))
         {
+            sfxManager.PlaySoundEffect("jump");
             IsJumping(true);
             _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
+        }
+        else if (Input.GetKeyDown(KeyCode.M))
+        {
+            HasMagic(true);
         }
         else if (Input.GetKeyDown(key: KeyCode.RightArrow) && _canTurn)
         {
@@ -75,6 +89,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             IsJumping(false);
+            HasMagic(false);
         }
     }
 
@@ -86,6 +101,11 @@ public class PlayerController : MonoBehaviour
     {
         _animator.SetBool(Jumping, isSpacePressed);
     }
+    
+    private void HasMagic(bool isMPressed)
+    {
+        _animator.SetBool(Magic, isMPressed);
+    }
 
     /// <summary>
     /// Prevents player from drifting on the x or z axis.
@@ -94,7 +114,7 @@ public class PlayerController : MonoBehaviour
     {
         transform.position = new Vector3(_startPosition.x, transform.position.y, _startPosition.z);
     }
-    
+
     /// <summary>
     /// Adds another platform ahead of the player so that it can't see the platforms being spawned.
     /// </summary>
@@ -122,11 +142,28 @@ public class PlayerController : MonoBehaviour
     {
         transform.Rotate(direction * _turnAngle);
     }
-    
+
     private void OnCollisionEnter(Collision other)
     {
-        // Records every platform we stand on.
-        currentPlatform = other.gameObject;
+        if (other.transform.CompareTag("obstacle"))
+        {
+            sfxManager.PlaySoundEffect("crash");
+            _animator.SetTrigger(IsDead);
+            isDead = true;
+            gameMusic.SetActive(false);
+        }
+        else if (other.transform.CompareTag("fire"))
+        {
+            sfxManager.PlaySoundEffect("fire");
+            _animator.SetTrigger(IsDead);
+            isDead = true;
+            gameMusic.SetActive(false);
+        }
+        else
+        {
+            // Records every platform we stand on.
+            currentPlatform = other.gameObject;
+        }
     }
 
     /// <summary>

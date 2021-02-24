@@ -10,6 +10,8 @@ public class Deactivate : MonoBehaviour
     /// <param name="player"></param>
     private void OnCollisionExit(Collision player)
     {
+        if (PlayerController.isDead) return;
+        
         if (player.gameObject.CompareTag("Player") && !_deactivationScheduled)
         {
             Invoke(nameof(SetInactive), 5.0f);

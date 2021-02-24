@@ -10,6 +10,8 @@ public class Scroll : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (PlayerController.isDead) return;
+        
         transform.position += PlayerController.player.transform.forward * (_gameSpeed * Time.deltaTime);
 
         if (PlayerController.currentPlatform == null) return;
