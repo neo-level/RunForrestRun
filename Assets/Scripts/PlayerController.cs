@@ -11,10 +11,14 @@ public class PlayerController : MonoBehaviour
 
     private Animator _animator;
     private Rigidbody _rigidbody;
+    private Rigidbody _grenadeRigidbody;
     private Vector3 _startPosition;
 
     [SerializeField] private SfxManager sfxManager;
     [SerializeField] private GameObject gameMusic;
+    [SerializeField] private GameObject grenade;
+    [SerializeField] private Transform grenadeStartPosition;
+    
 
     private bool _canTurn;
 
@@ -23,12 +27,13 @@ public class PlayerController : MonoBehaviour
 
     private static readonly int Jumping = Animator.StringToHash("isJumping");
     private static readonly int IsDead = Animator.StringToHash("isDead");
-    private static readonly int Magic = Animator.StringToHash("hasMagic");
+    private static readonly int Grenade = Animator.StringToHash("hasGrenade");
 
     private void Start()
     {
         _animator = GetComponent<Animator>();
         _rigidbody = GetComponent<Rigidbody>();
+        _grenadeRigidbody = grenade.GetComponent<Rigidbody>();
 
         // Starting position of player.
         player = gameObject;
@@ -104,7 +109,7 @@ public class PlayerController : MonoBehaviour
     
     private void HasMagic(bool isMPressed)
     {
-        _animator.SetBool(Magic, isMPressed);
+        _animator.SetBool(Grenade, isMPressed);
     }
 
     /// <summary>
@@ -194,5 +199,18 @@ public class PlayerController : MonoBehaviour
         {
             _canTurn = false;
         }
+    }
+    
+    private void ThrowGrenade()
+    {
+        grenade.transform.position = grenadeStartPosition.position;
+        grenade.SetActive(true);
+        _grenadeRigidbody.AddForce(transform.forward * 4000);
+        Invoke(nameof(RemoveGrenade),1);
+    }
+    
+    private void RemoveGrenade()
+    {
+        grenade.SetActive(false);
     }
 }
